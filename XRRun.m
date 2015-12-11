@@ -37,7 +37,7 @@
         NSString *xcodeVersion = [shareAppData xcodeVersion];
 
         //if xcode version is given
-        if (xcodeVersion == nil) {
+        if (xcodeVersion == nil || [xcodeVersion  isEqual: @""]) {
             
             //run xcodebuild -version to get the current machine xcode version
             NSTask *task = [[NSTask alloc] init];
@@ -74,8 +74,8 @@
         }
 
 
-        //if xcode version is 6.4
-        if ([xcodeVersion  isEqual: @"6.4"]) {
+        //if xcode version is 6.4 or 6.3
+        if ([xcodeVersion  hasPrefix: @"6.4"] || [xcodeVersion hasPrefix:@"6.3"]) {
             [decoder decodeObject];
             [decoder decodeObject];
         } else if ([xcodeVersion hasPrefix:@"7"]) { //if the xcode version is in 7
