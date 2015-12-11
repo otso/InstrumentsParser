@@ -174,9 +174,6 @@ int main(int argc, const char * argv[]) {
         
         if (outputFileName == (id)[NSNull null] || outputFileName.length == 0 ) outputFileName = @"ActivityMonitor";
         
-        inputdir = @"/Users/Virtusa/Documents/old-qa.trace";
-        xcodeVersion = @"6.1.1";
-        
         if (inputdir == nil ) {
             printf("InstrumentsParser help:\n\t-p \tprocess name\n\t-i \ttrace file\n\t-o \toutput path\n\t-n \toutput JSON file name \n\t-x \txcode version number \nor InstrumentsParser -i result.trace\n");
             exit(1);
