@@ -86,7 +86,8 @@
 
         double relativeTimestamp = [data[@"XRActivityClientTraceRelativeTimestamp"] doubleValue];
         double seconds = relativeTimestamp / 1000.0 / 1000.0 / 1000.0;
-        NSTimeInterval timestamp = startTime + seconds;
+        NSTimeInterval timestamp = (startTime + seconds) * 1000;
+        
 
         NSArray *processData = data[@"Processes"];
         for (NSDictionary * process in processData) {

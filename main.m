@@ -170,16 +170,21 @@ int main(int argc, const char * argv[]) {
         NSString *inputdir = [standardDefaults stringForKey:@"i"];
         NSString *outputdir = [standardDefaults stringForKey:@"o"];
         NSString *outputFileName = [standardDefaults stringForKey:@"n"];
+        NSString *xcodeVersion = [standardDefaults stringForKey:@"x"];
         
         if (outputFileName == (id)[NSNull null] || outputFileName.length == 0 ) outputFileName = @"ActivityMonitor";
         
+        inputdir = @"/Users/Virtusa/Documents/old-qa.trace";
+        xcodeVersion = @"6.1.1";
+        
         if (inputdir == nil ) {
-            printf("InstrumentsParser help:\n\t-p \tprocess name\n\t-i \ttrace file\n\t-o \toutput path\n\t-n \toutput JSON file name \nor InstrumentsParser -i result.trace\n");
+            printf("InstrumentsParser help:\n\t-p \tprocess name\n\t-i \ttrace file\n\t-o \toutput path\n\t-n \toutput JSON file name \n\t-x \txcode version number \nor InstrumentsParser -i result.trace\n");
             exit(1);
         }
         
         InstrumentsParserApp *shareAppData = [InstrumentsParserApp getInstance];
         [shareAppData setAppname:appname];  //share for XRActivityInsturmentRun.m
+        [shareAppData setXcodeVersion:xcodeVersion]; // set xcode version
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *workingDir = [fileManager currentDirectoryPath];

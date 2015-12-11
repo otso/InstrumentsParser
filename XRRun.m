@@ -7,6 +7,7 @@
 //
 
 #import "XRRun.h"
+#import "InstrumentsParserApp.h"
 
 #define targetProcess @"Recipes"
 
@@ -14,7 +15,7 @@
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-    if((self = [super init]))
+    if ((self = [super init]))
     {
         dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss:SSS"];
@@ -23,7 +24,7 @@
         runNumber = [[decoder decodeObject] unsignedIntegerValue];
 
         trackSegments = [decoder decodeObject];
-        
+
         // Totally not sure about these
         envVals = [[decoder decodeObject] boolValue];
         execname = [[decoder decodeObject] boolValue];
@@ -31,9 +32,58 @@
         pid = [decoder decodeObject][@"_pid"];
         launchControlProperties = [[decoder decodeObject] boolValue];
         args = [[decoder decodeObject] boolValue];
-        [decoder decodeObject];
-        [decoder decodeObject];
-        [decoder decodeObject]; //patch for XCode 7
+
+        InstrumentsParserApp *shareAppData = [InstrumentsParserApp getInstance];
+        NSString *xcodeVersion = [shareAppData xcodeVersion];
+
+        //if xcode version is given
+        if (xcodeVersion == nil) {
+            
+            //run xcodebuild -version to get the current machine xcode version
+            NSTask *task = [[NSTask alloc] init];
+            NSPipe *out = [NSPipe pipe];
+            NSFileHandle *file = out.fileHandleForReading;
+
+            [task setLaunchPath:@"/usr/bin/xcodebuild"];
+
+            NSArray *arguments;
+            NSString* newpath = [NSString stringWithFormat:@"-version"];
+            NSLog(@"shell script path: %@", newpath);
+            arguments = [NSArray arrayWithObjects:newpath, nil];
+            [task setArguments: arguments];
+            [task setStandardOutput: out];
+
+            //execute the xcode commandline script
+            [task launch];
+            [task waitUntilExit];
+
+            NSData *data = [file readDataToEndOfFile];
+            [file closeFile];
+
+            //manipulate the output string
+            NSString *output = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+
+            if (output == nil) {
+                printf("xcodebuild -version command can't be execute.\n");
+                exit(1);
+            }
+
+            NSString *versionString = [output componentsSeparatedByString:@"\n"][0];
+            xcodeVersion = [versionString stringByReplacingOccurrencesOfString: @"Xcode " withString:@""];
+            NSLog (@"Xcode version : %@", xcodeVersion);
+        }
+
+
+        //if xcode version is 6.4
+        if ([xcodeVersion  isEqual: @"6.4"]) {
+            [decoder decodeObject];
+            [decoder decodeObject];
+        } else if ([xcodeVersion hasPrefix:@"7"]) { //if the xcode version is in 7
+            [decoder decodeObject];
+            [decoder decodeObject];
+            [decoder decodeObject]; //patch for XCode 7
+        } //else no => [decoder decodeObject];
+
     }
     return self;
 }

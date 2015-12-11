@@ -15,6 +15,7 @@
 }
 
 @property (nonatomic,retain) NSString* appname;
+@property (nonatomic,retain) NSString* xcodeVersion;
 
 + (InstrumentsParserApp *) getInstance;
 
