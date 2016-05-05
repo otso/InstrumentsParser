@@ -40,6 +40,7 @@
 
 - (void)dealloc
 {
+    [super dealloc];
 }
 
 

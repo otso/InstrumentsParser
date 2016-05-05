@@ -172,8 +172,8 @@ int main(int argc, const char * argv[]) {
         
         //NSLog(@"appname[%@] inputfile[%@] outputfile[%@]",appname,inputfile,outputfile);
         
-        //appname = @"IphoneCom";
-        //inputdir = @"/Users/scottwu/Downloads/newenergy.trace";
+        //appname = @"com.baidu.mtc.xgt.test1";
+        //inputdir = @"/Users/xiangguangte/Codes/smallapple/result/instruments/automation.trace";
         
         if (appname == nil || inputdir == nil ) {
             printf("InstrumentsParser -p process_name -i result.trace -o /a/b/c \nor InstrumentsParser -p process_name -i result.trace\n");
@@ -236,9 +236,12 @@ int main(int argc, const char * argv[]) {
                         
                         // Read the trace file into memory
                         NSURL *traceFile = [NSURL fileURLWithPath:[resultUnzippedFile stringByExpandingTildeInPath]];
-                        // NSLog(@"%@",traceFile);
+                        NSLog(@"read trace file: %@",traceFile);
                         
                         NSData *traceData = [NSData dataWithContentsOfURL:traceFile];
+                        
+                            
+                        NSLog(@"size is: %u", (unsigned int)traceData.length);
                         
                         NSString *jsonString;
                         NSString *fileBasename = [[zipFile componentsSeparatedByString:@"."] objectAtIndex:0];
@@ -246,7 +249,8 @@ int main(int argc, const char * argv[]) {
                         //detect which instrument type
                         if ([Utils grepFile:resultUnzippedFile searchKeyword:@"UIARun"]) {
                             //NSLog(@"%@",traceFile);
-                            UIARun *run = [NSUnarchiver unarchiveObjectWithData:traceData];
+                            //UIARun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
+                            UIARun *run = [[[NSUnarchiver alloc] initForReadingWithData:traceData] decodeObject]; // !!!
                             //printf("\n%s\n", [[run description] UTF8String]);
                             jsonString = [run toJsonString];
                             NSString *jsonfile = [NSString stringWithFormat:@"%@/UIAutomation-%@",outputdir,fileBasename];
@@ -256,13 +260,15 @@ int main(int argc, const char * argv[]) {
                             //XRObjectAllocRun *run = [NSUnarchiver unarchiveObjectWithData:traceData];
                             //printf("\n%s\n", [[run description] UTF8String]);
                         }else if([Utils grepFile:resultUnzippedFile searchKeyword:@"XRActivityInstrumentRun"]){
-                            XRActivityInstrumentRun *run = [NSUnarchiver unarchiveObjectWithData:traceData];
+                            XRActivityInstrumentRun *run = [[[NSUnarchiver alloc] initForReadingWithData:traceData] decodeObject];
+                            //XRActivityInstrumentRun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
                             //printf("\n%s\n", [[run description] UTF8String]);
                             jsonString = [run toJsonString];
                             NSString *jsonfile = [NSString stringWithFormat:@"%@/ActivityMonitor-%@",outputdir,fileBasename];
                             [jsonString writeToFile:jsonfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
                         }else if ([Utils grepFile:resultUnzippedFile searchKeyword:@"XRVideoCardRun"]){
-                            XRVideoCardRun *run = [NSUnarchiver unarchiveObjectWithData:traceData];
+                            //XRVideoCardRun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
+                            XRVideoCardRun *run = [[[NSUnarchiver alloc] initForReadingWithData:traceData] decodeObject];
                             //NSLog(@"%@",run);
                             //printf("\n%s\n", [[run description] UTF8String]);
                             jsonString = [run toJsonString];
@@ -271,7 +277,8 @@ int main(int argc, const char * argv[]) {
                             //NSLog(@"%@",jsonString);
                             //printf("\n%s\n",jsonString);
                         }else if([Utils grepFile:resultUnzippedFile searchKeyword:@"XRStreamedPowerRun"]){
-                            XRStreamedPowerRun *run = [NSUnarchiver unarchiveObjectWithData:traceData];
+                            //XRStreamedPowerRun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
+                            XRStreamedPowerRun *run = [[[NSUnarchiver alloc] initForReadingWithData:traceData] decodeObject];
                             double testStartTime = [run getStartTime];
                             parseNetworkActivity(fileBasename, inputTraceFile, testStartTime, outputdir);
                             parseEnergyLevel(fileBasename, inputTraceFile, testStartTime, outputdir);

@@ -76,7 +76,6 @@
     }
 
     NSMutableArray *newArray = [[NSMutableArray alloc] init];
-    
     for (NSUInteger i=0; i<[sampleData count]; i++) {
         NSDictionary *data = sampleData[i];
         
@@ -122,6 +121,7 @@
 
 - (void)dealloc
 {
+    [super dealloc];
 }
 
 @end

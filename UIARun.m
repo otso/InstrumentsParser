@@ -12,7 +12,6 @@
 
 @implementation UIARun
 
-
 - (NSString *)formattedSample:(NSUInteger)index
 {
     NSDictionary *data = sampleData[index];
@@ -82,7 +81,6 @@
     
 }
 
-
 - (id)initWithCoder:(NSCoder *)decoder
 {
     if((self = [super initWithCoder:decoder]))
@@ -97,6 +95,7 @@
 
 - (void)dealloc
 {
+    [super dealloc];
 }
 
 /*
