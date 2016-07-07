@@ -85,7 +85,6 @@
         NSTimeInterval timestamp = startTime + seconds;
         
         NSArray *processData = data[@"Processes"];
-        [newArray addObject:[NSNull null]];
 
         for (NSDictionary *process in processData) {
             if ([process[@"Command"] isEqualToString:appname]) {
@@ -93,7 +92,7 @@
                 [dict addEntriesFromDictionary:process];
                 [dict setObject:[NSNumber numberWithDouble:timestamp] forKey:@"Timestamp"];
                 [dict setObject:[dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:timestamp]] forKey:@"Date"];
-                newArray[i] = dict;
+                [newArray addObject:dict];
                 break;
             }
 
