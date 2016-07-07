@@ -25,6 +25,7 @@
     [result appendFormat:@"Process: %@ ", targetProcess];
     
     NSArray *processData = data[@"Processes"];
+
     for (NSDictionary *process in processData) {
         if ([process[@"Command"] isEqualToString:targetProcess]) {
             double cpuUsage = [process[@"CPUUsage"] doubleValue];
@@ -74,7 +75,7 @@
         NSString *tmpname = [appname substringToIndex:16];
         appname = tmpname;
     }
-
+    
     NSMutableArray *newArray = [[NSMutableArray alloc] init];
     for (NSUInteger i=0; i<[sampleData count]; i++) {
         NSDictionary *data = sampleData[i];
@@ -84,6 +85,8 @@
         NSTimeInterval timestamp = startTime + seconds;
         
         NSArray *processData = data[@"Processes"];
+        [newArray addObject:[NSNull null]];
+
         for (NSDictionary *process in processData) {
             if ([process[@"Command"] isEqualToString:appname]) {
                 NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
@@ -91,9 +94,9 @@
                 [dict setObject:[NSNumber numberWithDouble:timestamp] forKey:@"Timestamp"];
                 [dict setObject:[dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:timestamp]] forKey:@"Date"];
                 newArray[i] = dict;
-                
                 break;
             }
+
         }
     }
     
