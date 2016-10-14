@@ -14,6 +14,7 @@ static InstrumentsParserApp *sharedInstance = nil;
 @implementation InstrumentsParserApp
 
 @synthesize appname;
+@synthesize xcodeVersion;
 
 +(InstrumentsParserApp *)getInstance
 {

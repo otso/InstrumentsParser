@@ -23,10 +23,9 @@
     double seconds = relativeTimestamp / 1000.0 / 1000.0 / 1000.0;
     NSTimeInterval timestamp = startTime + seconds;
     [result appendFormat:@"Process: %@ ", targetProcess];
-    
-    NSArray *processData = data[@"Processes"];
 
-    for (NSDictionary *process in processData) {
+    NSArray *processData = data[@"Processes"];
+    for (NSDictionary * process in processData) {
         if ([process[@"Command"] isEqualToString:targetProcess]) {
             double cpuUsage = [process[@"CPUUsage"] doubleValue];
             double residentSize = [process[@"ResidentSize"] doubleValue] / 1024;
@@ -34,6 +33,7 @@
             [result appendFormat:@"CPU Usage: %.2f%% ", cpuUsage];
             [result appendFormat:@"Res Size: %.2f KiB ", residentSize];
             [result appendFormat:@"Virt Size: %.2f KiB ", virtualSize];
+
             break;
         }
     }
@@ -49,12 +49,12 @@
         NSLog(@"get appname nil,cannot dump XRActivityInstrumentRun data");
         return nil;
     }
-    
+
     NSString *start = [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:startTime]];
     NSString *end = [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:endTime]];
     NSMutableString *result = [NSMutableString stringWithFormat:@"Run %u, starting at %@, running until %@\n", (unsigned int)runNumber, start, end];
     //NSLog(@"sampledata length is %lu",(unsigned long)[sampleData count]);
-    for(NSUInteger i=0; i<[sampleData count]; i++)
+    for (NSUInteger i = 0; i < [sampleData count]; i++)
     {
         [result appendFormat:@"Sample %u: %@\n", (unsigned int)i, [self formattedSample:i processName:appname]];
     }
@@ -65,55 +65,71 @@
 {
     InstrumentsParserApp *shareAppData = [InstrumentsParserApp getInstance];
     NSString *appname = [shareAppData appname];
-    if (!appname) {
-        NSLog(@"get appname nil,cannot dump XRActivityInstrumentRun data");
-        return nil;
-    }
-    
+//    if (!appname) {
+//        NSLog(@"get appname nil,cannot dump XRActivityInstrumentRun data");
+//        return nil;
+//    }
+
     //instrument get process name max length = 16
     if ([appname length] >= 16) {
         NSString *tmpname = [appname substringToIndex:16];
         appname = tmpname;
     }
-    
+
     NSMutableArray *newArray = [[NSMutableArray alloc] init];
-    for (NSUInteger i=0; i<[sampleData count]; i++) {
+
+    //total JSON array iteration
+    int count = 0;
+
+    for (NSUInteger i = 0; i < [sampleData count]; i++) {
         NSDictionary *data = sampleData[i];
-        
+
         double relativeTimestamp = [data[@"XRActivityClientTraceRelativeTimestamp"] doubleValue];
         double seconds = relativeTimestamp / 1000.0 / 1000.0 / 1000.0;
-        NSTimeInterval timestamp = startTime + seconds;
+        NSTimeInterval timestamp = (startTime + seconds) * 1000;
         
+
         NSArray *processData = data[@"Processes"];
 
-        for (NSDictionary *process in processData) {
-            if ([process[@"Command"] isEqualToString:appname]) {
+        for (NSDictionary * process in processData) {
+            if (appname != nil) {
+                if ([process[@"Command"] isEqualToString:appname]) {
+                    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+                    [dict addEntriesFromDictionary:process];
+                    [dict setObject:[NSNumber numberWithDouble:timestamp] forKey:@"Timestamp"];
+                    newArray[count] = dict;
+                    count++;
+
+                    break;
+                }
+
+            } else {
                 NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
                 [dict addEntriesFromDictionary:process];
                 [dict setObject:[NSNumber numberWithDouble:timestamp] forKey:@"Timestamp"];
-                [dict setObject:[dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:timestamp]] forKey:@"Date"];
-                [newArray addObject:dict];
-                break;
+                //[dict setObject:[dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:timestamp]] forKey:@"Date"];
+                newArray[count] = dict;
+                count++;
             }
 
         }
     }
-    
+
     NSError *error = nil;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:newArray options:NSJSONWritingPrettyPrinted error:&error];
-    if([jsonData length] >0 && error == nil){
+    if ([jsonData length] > 0 && error == nil) {
         NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         return jsonString;
-    }else{
+    } else {
         return nil;
     }
-    
+
 }
 
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-    if((self = [super initWithCoder:decoder]))
+    if ((self = [super initWithCoder:decoder]))
     {
         sampleData = [decoder decodeObject];
         [decoder decodeObject];

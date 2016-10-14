@@ -1,6 +1,10 @@
 # InstrumentsParser
-xcode version
-* under 6.3 Products/InstrumentsParser
-* 6.3* Products/InstrumentsParser_6.3
-* 7.0 Products/InstrumentsParser_7.0
-* 7.1 Products/InstrumentsParser_7.1
+
+<pre>
+InstrumentsParser help:
+	-p 	process name
+	-i 	trace file
+	-o 	output path
+	-n 	output JSON file name 
+	-x 	xcode version number 
+</pre>

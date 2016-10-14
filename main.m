@@ -19,7 +19,7 @@
 void parseNetworkActivity(NSString *fileBasename, NSString *inputTraceFile, double testStartTime, NSString *outputdir) {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error = nil;
-
+    
     //printf("\n%lf\n", [run getStartTime]);
     NSString *networkResultJsonString = nil;
     NSString *networkResultFile = [NSString stringWithFormat:@"%@/Trace%@.run/network_activity.dat.archive",inputTraceFile,fileBasename];
@@ -169,19 +169,19 @@ int main(int argc, const char * argv[]) {
         NSString *appname = [standardDefaults stringForKey:@"p"];
         NSString *inputdir = [standardDefaults stringForKey:@"i"];
         NSString *outputdir = [standardDefaults stringForKey:@"o"];
+        NSString *outputFileName = [standardDefaults stringForKey:@"n"];
+        NSString *xcodeVersion = [standardDefaults stringForKey:@"x"];
         
-        //NSLog(@"appname[%@] inputfile[%@] outputfile[%@]",appname,inputfile,outputfile);
+        if (outputFileName == (id)[NSNull null] || outputFileName.length == 0 ) outputFileName = @"ActivityMonitor";
         
-        //appname = @"com.baidu.mtc.xgt.test1";
-        //inputdir = @"/Users/xiangguangte/Codes/smallapple/result/instruments/automation.trace";
-        
-        if (appname == nil || inputdir == nil ) {
-            printf("InstrumentsParser -p process_name -i result.trace -o /a/b/c \nor InstrumentsParser -p process_name -i result.trace\n");
+        if (inputdir == nil ) {
+            printf("InstrumentsParser help:\n\t-p \tprocess name\n\t-i \ttrace file\n\t-o \toutput path\n\t-n \toutput JSON file name \n\t-x \txcode version number \nor InstrumentsParser -i result.trace\n");
             exit(1);
         }
         
         InstrumentsParserApp *shareAppData = [InstrumentsParserApp getInstance];
         [shareAppData setAppname:appname];  //share for XRActivityInsturmentRun.m
+        [shareAppData setXcodeVersion:xcodeVersion]; // set xcode version
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
         NSString *workingDir = [fileManager currentDirectoryPath];
@@ -264,7 +264,7 @@ int main(int argc, const char * argv[]) {
                             //XRActivityInstrumentRun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
                             //printf("\n%s\n", [[run description] UTF8String]);
                             jsonString = [run toJsonString];
-                            NSString *jsonfile = [NSString stringWithFormat:@"%@/ActivityMonitor-%@",outputdir,fileBasename];
+                            NSString *jsonfile = [NSString stringWithFormat:@"%@/%@.json",outputdir,outputFileName];
                             [jsonString writeToFile:jsonfile atomically:YES encoding:NSUTF8StringEncoding error:&error];
                         }else if ([Utils grepFile:resultUnzippedFile searchKeyword:@"XRVideoCardRun"]){
                             //XRVideoCardRun *run = [NSKeyedUnarchiver unarchiveObjectWithData:traceData];
